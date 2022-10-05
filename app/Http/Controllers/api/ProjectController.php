@@ -49,6 +49,7 @@ class ProjectController extends Controller
 
             $project = Project::create(array_merge(
                 $validator->validated(),
+                ['product_owner_id' => auth()->user()->id]
             ));
         } catch (\Throwable $th) {
             throw $th;

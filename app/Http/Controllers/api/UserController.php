@@ -19,7 +19,6 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-
     public function index()
     {
         try {
@@ -46,6 +45,7 @@ class UserController extends Controller
                 'name' => 'required|string',
                 'email' => 'required|string|unique:users',
                 'password' => 'required|string|min:8',
+                'role' => 'required|string',
             ]);
 
             if ($validator->fails()) {

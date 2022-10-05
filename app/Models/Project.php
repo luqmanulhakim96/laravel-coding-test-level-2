@@ -12,5 +12,16 @@ class Project extends Model
 
     protected $fillable = [
         'name',
+        'product_owner_id'
     ];
+
+    public function tasks()
+    {
+        return $this->hasMany('App\Models\Tasks');
+    }
+
+    public function product_owner()
+    {
+        return $this->belongsTo('App\Models\Users', 'product_owner_id');
+    }
 }

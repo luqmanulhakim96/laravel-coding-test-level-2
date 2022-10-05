@@ -13,8 +13,13 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
-        'status',
+        'status', // NOT_STARTED | IN_PROGRESS | READY_FOR_TEST |
         'project_id',
         'user_id',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project', 'project_id');
+    }
 }
