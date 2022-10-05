@@ -3,6 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\api\ProjectController;
+use App\Http\Controllers\api\TaskController;
+use App\Http\Controllers\Auth\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +19,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::group(
+    [
+        'prefix' => 'v1'
+    ],
+    function () {
+        Route::post('/users/login', [AuthController::class, 'login']);
+
+        Route::resource('users', UserController::class);
+
+        Route::resource('projects', ProjectController::class);
+        Route::resource('tasks', TaskController::class);
+    }
+);
