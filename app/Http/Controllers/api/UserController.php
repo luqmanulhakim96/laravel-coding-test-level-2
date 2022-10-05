@@ -60,7 +60,7 @@ class UserController extends Controller
             ));
 
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th], 404);
         }
 
 

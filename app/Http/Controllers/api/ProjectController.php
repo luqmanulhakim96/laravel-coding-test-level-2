@@ -60,7 +60,6 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         try {
-
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|unique:projects',
             ]);
@@ -74,9 +73,8 @@ class ProjectController extends Controller
                 ['product_owner_id' => auth()->user()->id]
             ));
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th], 404);
         }
-
 
         return response()->json([
             'message' => 'Project created',

@@ -52,7 +52,7 @@ class TaskController extends Controller
                 ['status' => "NOT_STARTED"]
             ));
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th], 404);
         }
 
 
