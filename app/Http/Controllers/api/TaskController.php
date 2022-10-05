@@ -39,7 +39,8 @@ class TaskController extends Controller
             $validator = Validator::make($request->all(), [
                 'title' => 'string|required',
                 'description' => 'string',
-                'status' => 'required|string',
+                'project_id' => 'required',
+                'user_id' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -48,13 +49,10 @@ class TaskController extends Controller
 
             $task = Task::create(array_merge(
                 $validator->validated(),
-                [
-                    'project_id' => $request->project_id,
-                    'user_id' => auth()->user()->id
-                ]
+                ['status' => "NOT_STARTED"]
             ));
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th], 404);
         }
 
 
@@ -91,12 +89,22 @@ class TaskController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $task = Task::findOrFail($id);
-            $validator = Validator::make($request->all(), [
-                'title' => 'string|required',
-                'description' => 'string',
-                'status' => 'required|string',
-            ]);
+            $task = Task::with('project')->findOrFail($id);
+
+            if ($task->user_id == auth()->user()->id) {
+                $validator = Validator::make($request->all(), [
+                    'title' => 'prohibited',
+                    'description' => 'prohibited',
+                    'status' => 'required|string',
+                ]);
+            } else if ($task->project->product_owner_id == auth()->user()->id) {
+                $validator = Validator::make($request->all(), [
+                    'title' => 'string|required',
+                    'description' => 'string',
+                    'status' => 'required|string',
+                ]);
+            }
+
 
             $task->fill($request->all())->save();
 

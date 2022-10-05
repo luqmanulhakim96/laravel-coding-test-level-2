@@ -24,11 +24,30 @@ Route::group(
         'prefix' => 'v1'
     ],
     function () {
-        Route::post('/users/login', [AuthController::class, 'login']);
+        Route::post('users/login', [AuthController::class, 'login']);
 
-        Route::resource('users', UserController::class);
+        Route::group(
+            ['middleware' => ['admin']],
+            function () {
+                Route::resource('users', UserController::class);
+            }
+        );
 
-        Route::resource('projects', ProjectController::class);
-        Route::resource('tasks', TaskController::class);
+        Route::group(
+            ['middleware' => ['product_owner']],
+            function () {
+                Route::post('projects', [ProjectController::class, 'store']);
+                Route::post('tasks', [TaskController::class, 'store']);
+            }
+        );
+
+        Route::resource('projects', ProjectController::class)->only([
+            'show', 'destroy', 'update'
+        ]);
+        Route::post('projects', [ProjectController::class, 'index']);
+
+        Route::resource('tasks', TaskController::class)->only([
+            'index', 'show', 'destroy', 'update'
+        ]);
     }
 );

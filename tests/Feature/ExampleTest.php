@@ -14,7 +14,11 @@ class ExampleTest extends TestCase
      */
     public function test_example()
     {
-        $response = $this->get('/');
+        $this->artisan('db:wipe');
+        $this->artisan('migrate');
+        $this->artisan('db:seed');
+
+        $response = $this->get('api');
 
         $response->assertStatus(200);
     }

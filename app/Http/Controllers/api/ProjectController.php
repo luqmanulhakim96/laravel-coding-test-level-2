@@ -18,10 +18,32 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $projects = Project::get();
+            $validator = Validator::make($request->all(), [
+                'q' => 'string|max:100',
+                'pageIndex' => 'integer',
+                'pageSize' => 'integer',
+                'sortBy' => 'string|max:100',
+                'sortDirection' => 'string|max:4',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors()->toJson(), 400);
+            }
+
+            $limit = $request->pageSize ?? 3;
+            $offset = $request->pageIndex ?? 0;
+            $sortBy = $request->sortBy ?? 'name';
+            $sortDirection = $request->sortDirection ?? 'ASC';
+
+            $projects = Project::where('name', 'LIKE', '%' . $request->q . '%');
+            $projects = $projects->offset($offset)
+                ->limit($limit)
+                ->orderBy($sortBy, $sortDirection)
+                ->get();
+
         } catch (\Throwable $th) {
             return response()->json(['message' => $th], 404);
         }
@@ -38,7 +60,6 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         try {
-
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|unique:projects',
             ]);
@@ -49,11 +70,11 @@ class ProjectController extends Controller
 
             $project = Project::create(array_merge(
                 $validator->validated(),
+                ['product_owner_id' => auth()->user()->id]
             ));
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th], 404);
         }
-
 
         return response()->json([
             'message' => 'Project created',
