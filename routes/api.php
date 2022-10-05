@@ -42,8 +42,9 @@ Route::group(
         );
 
         Route::resource('projects', ProjectController::class)->only([
-            'index', 'show', 'destroy', 'update'
+            'show', 'destroy', 'update'
         ]);
+        Route::post('projects', [ProjectController::class, 'index']);
 
         Route::resource('tasks', TaskController::class)->only([
             'index', 'show', 'destroy', 'update'
